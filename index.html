@@ -589,15 +589,75 @@
         function RenderAbout() {
             const t = getTheme();
             return `
-            <div class="max-w-4xl mx-auto py-12 animate-fade-in px-4 text-center">
-                <h2 class="text-4xl md:text-5xl font-black mb-4 ${t.text}">THE STORY OF <span class="text-red-500">ANOZ</span></h2>
-                <div class="rounded-3xl overflow-hidden border relative group hover:shadow-2xl transition duration-500 ${t.card} mt-12 p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 text-left">
-                    <div class="relative"><div class="w-48 h-48 rounded-full p-1.5 bg-gradient-to-br from-red-500 via-yellow-500 to-purple-600 animate-spin-slow"><div class="w-full h-full rounded-full bg-slate-800 flex items-center justify-center text-6xl font-black text-slate-700">A</div></div><div class="absolute -top-2 -right-2 bg-yellow-400 p-2 rounded-full border-4 border-[#111]"><i data-lucide="crown"></i></div></div>
+            <div class="max-w-6xl mx-auto py-12 animate-fade-in px-4">
+                <div class="text-center mb-16 animate-fade-in-up">
+                    <h2 class="text-4xl md:text-5xl font-black mb-4 ${t.text}">THE STORY OF <span class="text-red-500">ANOZ</span></h2>
+                    <p class="text-lg ${t.textMuted} max-w-2xl mx-auto">Membangun ekosistem top-up game yang aman, cepat, dan terpercaya untuk seluruh gamers Indonesia.</p>
+                </div>
+
+                <!-- Main Story Card -->
+                <div class="rounded-3xl overflow-hidden border relative group hover:shadow-2xl transition duration-500 ${t.card} p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 text-left animate-fade-in-up" style="animation-delay: 0.1s">
+                    <div class="relative shrink-0">
+                         <!-- Removed animate-spin-slow below -->
+                         <div class="w-48 h-48 md:w-56 md:h-56 rounded-full p-2 bg-gradient-to-br from-red-500 via-yellow-500 to-purple-600">
+                            <div class="w-full h-full rounded-full overflow-hidden border-4 border-[#111]">
+                                <!-- GANTI LINK FOTO DI SINI -->
+                                <img src="https://i.imgur.com/DXZSEeA.png" alt="Founder" class="w-full h-full object-cover">
+                                <!-- Removed hover:scale-110 and transition -->
+                            </div>
+                         </div>
+                         <div class="absolute -bottom-2 right-4 bg-yellow-400 text-black px-4 py-1 rounded-full border-4 border-[#111] font-bold text-xs shadow-lg animate-bounce">CEO & FOUNDER</div>
+                    </div>
                     <div>
-                        <h3 class="text-3xl font-black uppercase mb-1 ${t.text}">Adisa Nawfal <span class="text-red-500">Zia-ul alam</span></h3>
-                        <div class="inline-block px-4 py-1 rounded-full bg-red-600 text-white text-xs font-bold mb-4">FOUNDER & CEO</div>
-                        <p class="leading-relaxed ${t.textMuted} mb-4"><strong class="text-red-500">"ANOZ"</strong> adalah brand dari <strong class="${t.text}">Adisa Nawfal</strong> (NOpal). Dedikasi untuk memberikan akses top-up game termurah dan teraman.</p>
-                        <p class="text-sm italic font-serif text-slate-500">"Gaming bukan sekadar hobi, tapi gaya hidup."</p>
+                        <h3 class="text-3xl font-black uppercase mb-2 ${t.text}">Adisa Nawfal <span class="text-red-500">Zia-ul alam</span></h3>
+                        <p class="leading-relaxed ${t.textMuted} mb-4 text-lg">
+                            "Berawal dari hobi bermain game kompetitif, saya menyadari sulitnya mencari tempat top-up yang <strong>murah</strong> namun tetap <strong>aman 100%</strong>. 
+                            <span class="text-red-500 font-bold">ANOZ Store</span> lahir sebagai solusi untuk masalah tersebut."
+                        </p>
+                        <div class="flex gap-6 mt-6 pt-6 border-t ${state.isDarkMode ? 'border-white/10' : 'border-slate-200'}">
+                            <div><h4 class="text-2xl font-black ${t.text}">50K+</h4><p class="text-xs ${t.textMuted} uppercase tracking-wider">Transaksi</p></div>
+                            <div><h4 class="text-2xl font-black ${t.text}">10K+</h4><p class="text-xs ${t.textMuted} uppercase tracking-wider">Member Aktif</p></div>
+                            <div><h4 class="text-2xl font-black ${t.text}">4.9</h4><p class="text-xs ${t.textMuted} uppercase tracking-wider">Rating</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Why Us Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                    <div class="p-8 rounded-3xl border ${t.card} hover:-translate-y-2 transition duration-300 animate-fade-in-up" style="animation-delay: 0.2s">
+                        <div class="w-12 h-12 bg-red-500/10 rounded-xl flex items-center justify-center text-red-500 mb-4"><i data-lucide="zap" width="24"></i></div>
+                        <h4 class="font-bold text-lg mb-2 ${t.text}">Proses Kilat</h4>
+                        <p class="text-sm ${t.textMuted}">Sistem otomatis yang memproses pesanan Anda dalam hitungan detik, 24 jam non-stop.</p>
+                    </div>
+                    <div class="p-8 rounded-3xl border ${t.card} hover:-translate-y-2 transition duration-300 animate-fade-in-up" style="animation-delay: 0.3s">
+                        <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-500 mb-4"><i data-lucide="shield-check" width="24"></i></div>
+                        <h4 class="font-bold text-lg mb-2 ${t.text}">Legal & Aman</h4>
+                        <p class="text-sm ${t.textMuted}">Jaminan uang kembali jika terjadi kesalahan. Stok 100% legal anti-ban.</p>
+                    </div>
+                    <div class="p-8 rounded-3xl border ${t.card} hover:-translate-y-2 transition duration-300 animate-fade-in-up" style="animation-delay: 0.4s">
+                        <div class="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center text-green-500 mb-4"><i data-lucide="users" width="24"></i></div>
+                        <h4 class="font-bold text-lg mb-2 ${t.text}">Komunitas</h4>
+                        <p class="text-sm ${t.textMuted}">Bergabung dengan ribuan gamers lainnya. Event turnamen rutin setiap bulan.</p>
+                    </div>
+                </div>
+
+                <!-- Community Gallery -->
+                <div class="mt-16 animate-fade-in-up" style="animation-delay: 0.5s">
+                    <h3 class="text-2xl font-black text-center mb-8 ${t.text}">GALERI KOMUNITAS</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="aspect-square rounded-2xl overflow-hidden bg-slate-800"><img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=300&h=300" class="w-full h-full object-cover hover:scale-110 transition duration-500 opacity-80 hover:opacity-100"></div>
+                        <div class="aspect-square rounded-2xl overflow-hidden bg-slate-800"><img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&q=80&w=300&h=300" class="w-full h-full object-cover hover:scale-110 transition duration-500 opacity-80 hover:opacity-100"></div>
+                        <div class="aspect-square rounded-2xl overflow-hidden bg-slate-800"><img src="https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?auto=format&fit=crop&q=80&w=300&h=300" class="w-full h-full object-cover hover:scale-110 transition duration-500 opacity-80 hover:opacity-100"></div>
+                        <div class="aspect-square rounded-2xl overflow-hidden bg-slate-800"><img src="https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&q=80&w=300&h=300" class="w-full h-full object-cover hover:scale-110 transition duration-500 opacity-80 hover:opacity-100"></div>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div class="mt-16 text-center animate-fade-in-up" style="animation-delay: 0.6s">
+                    <h3 class="text-2xl font-bold mb-6 ${t.text}">Bergabunglah Bersama Kami!</h3>
+                    <div class="flex justify-center gap-4">
+                        <a href="#" class="px-8 py-4 bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-xl font-bold flex items-center gap-2 transition transform hover:-translate-y-1 shadow-lg shadow-[#5865F2]/20"><i data-lucide="gamepad-2"></i> Discord Community</a>
+                        <a href="#" class="px-8 py-4 bg-gradient-to-r from-pink-500 to-orange-500 text-white rounded-xl font-bold flex items-center gap-2 transition transform hover:-translate-y-1 shadow-lg shadow-pink-500/20"><i data-lucide="instagram"></i> Follow Instagram</a>
                     </div>
                 </div>
             </div>`;
