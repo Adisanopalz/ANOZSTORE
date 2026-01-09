@@ -3,22 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Official AnozStore</title>
+    <title>AnozStore - Official Gaming Shop</title>
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom Styles & Animation -->
     <style>
-        /* Custom Fonts & Global Styles */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
-        
         body {
-            font-family: 'Inter', sans-serif;
-            cursor: none; /* Hide default cursor for custom one */
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
         }
 
-        /* Hide Scrollbar but allow scroll */
+        /* Hide Default Cursor for Custom Cursor logic */
+        @media (min-width: 768px) {
+            body, a, button, input {
+                cursor: none;
+            }
+        }
+
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #111; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
@@ -37,26 +47,28 @@
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.8; transform: scale(1.05); }
         }
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-100%); }
-        }
         @keyframes shimmer {
             0% { left: -150%; }
             100% { left: 150%; }
         }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
+        .animate-fade-in { animation: fadeInUp 0.6s ease-out forwards; }
         .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; }
         .animate-float { animation: float 3s ease-in-out infinite; }
         .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
         .animate-scroll { animation: scroll 20s linear infinite; }
         .animate-scroll-fast { animation: scroll 15s linear infinite; }
-        
-        .shimmer-effect {
-            position: relative;
-            overflow: hidden;
-        }
-        .shimmer-effect::after {
+        .animate-spin-slow { animation: spin-slow 8s linear infinite; }
+
+        .animate-shimmer-effect::after {
             content: '';
             position: absolute;
             top: 0;
@@ -68,407 +80,45 @@
             animation: shimmer 3s infinite;
         }
 
-        /* Theme Classes */
-        .dark-mode {
-            background-color: #050505;
-            color: #f1f5f9;
-        }
-        .light-mode {
-            background-color: #fff1f2;
-            color: #0f172a;
-        }
+        /* Utils */
+        .glass { backdrop-filter: blur(12px); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Cursor Styles */
+        #cursor-main { pointer-events: none; z-index: 9999; position: fixed; top: 0; left: 0; margin-top: -12px; margin-left: -8px; transition: transform 0.1s ease-out; }
+        #cursor-dot { pointer-events: none; z-index: 9998; position: fixed; top: 0; left: 0; transition: all 0.15s ease-out; }
     </style>
 </head>
-<body class="dark-mode transition-colors duration-500 overflow-x-hidden">
+<body class="bg-[#050505] text-slate-100 transition-colors duration-500">
 
-    <!-- CUSTOM CURSOR -->
-    <div id="cursor-main" class="hidden md:block fixed top-0 left-0 pointer-events-none z-[9999] transition-transform duration-75 ease-out" style="margin-top: -12px; margin-left: -8px;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"><path d="M2 2L21 8L11 12L8 21L2 2Z" fill="#ef4444" stroke="white"></path></svg>
+    <!-- ROOT APP CONTAINER -->
+    <div id="app" class="min-h-screen relative pb-20 md:pb-0">
+        <!-- Content injected by JS -->
     </div>
-    <div id="cursor-dot" class="hidden md:block fixed top-0 left-0 pointer-events-none z-[9998] transition-all duration-300 ease-out">
-        <div class="relative -top-3 -left-3 w-6 h-6 border border-dashed border-red-500 rounded-full flex items-center justify-center opacity-40">
+
+    <!-- CUSTOM CURSOR DOM -->
+    <div id="cursor-main" class="hidden md:block">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]">
+            <path d="M2 2L21 8L11 12L8 21L2 2Z" fill="#ef4444" stroke="white" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    <div id="cursor-dot" class="hidden md:block">
+        <div id="cursor-dot-inner" class="relative -top-3 -left-3 w-6 h-6 border border-dashed border-red-400 rounded-full flex items-center justify-center opacity-40 scale-50 transition-all duration-300">
             <div class="w-0.5 h-full bg-red-500/20 absolute"></div>
             <div class="h-0.5 w-full bg-red-500/20 absolute"></div>
         </div>
     </div>
 
-    <!-- RUNNING TEXT -->
-    <div id="running-text" class="w-full py-2 overflow-hidden z-50 relative bg-red-900/20 text-red-200">
-        <div class="flex animate-scroll-fast whitespace-nowrap gap-10">
-            <div class="flex items-center gap-10 text-xs font-bold tracking-widest uppercase">
-                <span>⚡ Welcome to Official AnozStore!</span>
-                <span>🛡️ Layanan Top Up 24 Jam Aman & Terpercaya</span>
-                <span>⚠️ Hati-hati penipuan mengatasnamakan admin!</span>
-                <span>🔥 Promo Gajian Sedang Berlangsung!</span>
-            </div>
-            <div class="flex items-center gap-10 text-xs font-bold tracking-widest uppercase">
-                <span>⚡ Welcome to Official AnozStore!</span>
-                <span>🛡️ Layanan Top Up 24 Jam Aman & Terpercaya</span>
-                <span>⚠️ Hati-hati penipuan mengatasnamakan admin!</span>
-                <span>🔥 Promo Gajian Sedang Berlangsung!</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- NAVBAR -->
-    <nav id="navbar" class="sticky top-0 z-40 backdrop-blur-xl border-b border-white/5 bg-[#050505]/80 transition-colors duration-500">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="flex justify-between items-center h-20">
-                <!-- Logo -->
-                <div class="flex items-center gap-3 cursor-pointer group" onclick="switchTab('home')">
-                    <div class="w-10 h-10 bg-gradient-to-tr from-red-600 to-red-400 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/20 group-hover:rotate-6 transition duration-300">
-                        <i data-lucide="crown" class="text-white w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-black tracking-tighter leading-none">ANOZ<span class="text-red-500">STORE</span></h1>
-                        <p class="text-[10px] font-bold tracking-widest uppercase text-slate-400">Official Gaming Shop</p>
-                    </div>
-                </div>
-
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center gap-8">
-                    <button onclick="switchTab('home')" class="nav-link font-bold text-sm tracking-wide transition text-red-500" data-target="home">BERANDA</button>
-                    <button onclick="switchTab('history')" class="nav-link font-bold text-sm tracking-wide transition text-slate-400 hover:text-red-500" data-target="history">RIWAYAT</button>
-                    <button onclick="switchTab('about')" class="nav-link font-bold text-sm tracking-wide transition text-slate-400 hover:text-red-500" data-target="about">TENTANG KAMI</button>
-                    
-                    <!-- Theme Toggle -->
-                    <button onclick="toggleTheme()" id="btn-theme" class="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 border border-slate-700 bg-slate-800 text-yellow-400 hover:bg-slate-700">
-                        <i data-lucide="sun" class="w-5 h-5 fill-current animate-spin-slow"></i>
-                    </button>
-                </div>
-
-                <!-- Mobile Menu Button -->
-                <div class="md:hidden flex items-center gap-4">
-                    <button onclick="toggleTheme()" id="btn-theme-mobile" class="text-yellow-400"><i data-lucide="sun" class="w-6 h-6 fill-current"></i></button>
-                    <button onclick="toggleMenu()" class="text-slate-100"><i data-lucide="menu"></i></button>
-                </div>
-            </div>
-        </div>
-        <!-- Mobile Dropdown -->
-        <div id="mobile-menu" class="hidden md:hidden border-b border-white/5 p-6 space-y-4 bg-[#111111]/90">
-            <button onclick="switchTab('home'); toggleMenu()" class="block w-full text-left font-bold text-white">BERANDA</button>
-            <button onclick="switchTab('history'); toggleMenu()" class="block w-full text-left font-bold text-white">RIWAYAT</button>
-            <button onclick="switchTab('about'); toggleMenu()" class="block w-full text-left font-bold text-white">TENTANG KAMI</button>
-        </div>
-    </nav>
-
-    <!-- NOTIFICATION TOAST -->
-    <div id="notification" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[60] px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 translate-y-[-20px] pointer-events-none">
-        <i id="notif-icon" data-lucide="check" class="w-5 h-5"></i>
-        <span id="notif-msg" class="font-bold text-sm tracking-wide">Pesan Notifikasi</span>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <main class="max-w-7xl mx-auto px-4 md:px-6 py-8 relative z-10 min-h-screen">
-        
-        <!-- VIEW: HOME -->
-        <div id="view-home" class="animate-fade-in-up">
-            
-            <!-- BANNER SLIDER -->
-            <div class="relative rounded-3xl overflow-hidden mb-8 border border-white/5 shadow-2xl group h-[300px] md:h-[350px]">
-                <div id="banner-container" class="w-full h-full relative">
-                    <!-- Banners will be injected here via JS -->
-                </div>
-                <!-- Controls -->
-                <button onclick="prevBanner()" class="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/20 hover:bg-black/50 text-white backdrop-blur-md border border-white/10 transition-all opacity-0 group-hover:opacity-100 hover:scale-110"><i data-lucide="chevron-left"></i></button>
-                <button onclick="nextBanner()" class="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/20 hover:bg-black/50 text-white backdrop-blur-md border border-white/10 transition-all opacity-0 group-hover:opacity-100 hover:scale-110"><i data-lucide="chevron-right"></i></button>
-            </div>
-
-            <!-- FLASH SALE -->
-            <div class="mb-12">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="zap" class="text-yellow-400 fill-yellow-400 animate-pulse w-6 h-6"></i>
-                        <h3 class="text-xl font-black italic tracking-tighter">FLASH SALE</h3>
-                    </div>
-                    <div class="flex items-center gap-2 bg-red-600 px-3 py-1 rounded-lg text-white font-mono font-bold text-sm animate-pulse-slow">
-                        <i data-lucide="clock" class="w-4 h-4"></i>
-                        <span id="flash-sale-timer">03 : 00 : 00</span>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="flash-sale-grid">
-                    <!-- Items injected via JS -->
-                </div>
-            </div>
-
-            <!-- GAME FILTER & GRID -->
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 rounded-lg bg-red-500/10"><i data-lucide="star" class="text-red-500 fill-red-500 w-6 h-6"></i></div>
-                    <h3 class="text-2xl font-black tracking-tight">SEMUA PRODUK</h3>
-                </div>
-            </div>
-            
-            <div class="flex flex-wrap gap-2 mb-8" id="category-tabs">
-                <!-- Categories injected via JS -->
-            </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6 min-h-[400px]" id="game-grid">
-                <!-- Games injected via JS -->
-            </div>
-
-            <!-- FEATURES -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-16 md:mt-20 pt-10 border-t border-white/10">
-                <div class="flex flex-col items-center text-center p-6 rounded-2xl bg-[#111111]/80 border border-white/5 animate-fade-in-up">
-                    <div class="p-4 bg-red-500/10 rounded-full text-red-500 mb-4 animate-float"><i data-lucide="zap" class="w-8 h-8"></i></div>
-                    <h4 class="font-bold text-lg">Proses Kilat</h4>
-                    <p class="text-sm text-slate-400 mt-2 leading-relaxed">Sistem otomatis 24 jam. Hitungan detik langsung masuk.</p>
-                </div>
-                <div class="flex flex-col items-center text-center p-6 rounded-2xl bg-[#111111]/80 border border-white/5 animate-fade-in-up" style="animation-delay: 0.2s">
-                    <div class="p-4 bg-green-500/10 rounded-full text-green-500 mb-4 animate-float"><i data-lucide="shield-check" class="w-8 h-8"></i></div>
-                    <h4 class="font-bold text-lg">100% Legal & Aman</h4>
-                    <p class="text-sm text-slate-400 mt-2 leading-relaxed">Transaksi terjamin aman. Garansi uang kembali jika gagal.</p>
-                </div>
-                <div class="flex flex-col items-center text-center p-6 rounded-2xl bg-[#111111]/80 border border-white/5 animate-fade-in-up" style="animation-delay: 0.4s">
-                    <div class="p-4 bg-yellow-500/10 rounded-full text-yellow-500 mb-4 animate-float"><i data-lucide="crown" class="w-8 h-8"></i></div>
-                    <h4 class="font-bold text-lg">Layanan VIP</h4>
-                    <p class="text-sm text-slate-400 mt-2 leading-relaxed">Prioritas pelayanan untuk kepuasan pengalaman belanja kamu.</p>
-                </div>
-            </div>
-
-            <!-- STATS COUNTER -->
-            <div class="mt-16 rounded-3xl p-8 border border-white/5 bg-[#111111]/80 relative overflow-hidden">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 relative z-10" id="stats-container">
-                    <!-- Stats injected via JS -->
-                </div>
-            </div>
-
-            <!-- TESTIMONIALS -->
-            <div class="mt-20">
-                <div class="flex items-center gap-3 mb-8 justify-center">
-                    <div class="p-2 rounded-lg bg-red-500/10 animate-float"><i data-lucide="quote" class="text-red-500 fill-red-500 w-6 h-6"></i></div>
-                    <h3 class="text-2xl font-black tracking-tight uppercase">Kata Mereka</h3>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="testimonials-grid">
-                    <!-- Testimonials injected via JS -->
-                </div>
-            </div>
-
-            <!-- FAQ -->
-            <div class="mt-20 max-w-3xl mx-auto">
-                <div class="text-center mb-10">
-                    <h3 class="text-2xl font-black">PERTANYAAN UMUM</h3>
-                    <p class="text-slate-400 mt-2">Jawaban cepat untuk pertanyaan kamu</p>
-                </div>
-                <div class="space-y-4" id="faq-container">
-                    <!-- FAQs injected via JS -->
-                </div>
-            </div>
-
-            <!-- PARTNER MARQUEE -->
-            <div class="mt-20 py-8 overflow-hidden relative">
-                <div class="absolute inset-0 z-10 pointer-events-none bg-gradient-to-r from-[#050505] via-transparent to-[#050505]"></div>
-                <div class="flex gap-12 whitespace-nowrap animate-scroll-fast hover:[animation-play-state:paused] opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                    <span class="text-2xl font-black text-slate-500">BCA</span>
-                    <span class="text-2xl font-black text-slate-500">MANDIRI</span>
-                    <span class="text-2xl font-black text-slate-500">BRI</span>
-                    <span class="text-2xl font-black text-slate-500">DANA</span>
-                    <span class="text-2xl font-black text-slate-500">OVO</span>
-                    <span class="text-2xl font-black text-slate-500">GOPAY</span>
-                    <span class="text-2xl font-black text-slate-500">SHOPEEPAY</span>
-                    <span class="text-2xl font-black text-slate-500">QRIS</span>
-                    <span class="text-2xl font-black text-slate-500">VISA</span>
-                    <span class="text-2xl font-black text-slate-500">MASTERCARD</span>
-                    <!-- Duplicates for loop -->
-                    <span class="text-2xl font-black text-slate-500">BCA</span>
-                    <span class="text-2xl font-black text-slate-500">MANDIRI</span>
-                    <span class="text-2xl font-black text-slate-500">BRI</span>
-                    <span class="text-2xl font-black text-slate-500">DANA</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW: DETAIL (Hidden by default) -->
-        <div id="view-detail" class="hidden animate-fade-in-up max-w-5xl mx-auto">
-            <button onclick="handleBack()" class="flex items-center text-slate-400 hover:text-red-500 mb-8 group font-bold tracking-wide transition cursor-pointer">
-                <div class="p-2 rounded-full mr-3 border border-white/10 group-hover:bg-red-500 group-hover:text-white group-hover:border-red-500 transition"><i data-lucide="chevron-left" class="w-5 h-5"></i></div>
-                Kembali ke Beranda
-            </button>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
-                <!-- Left: Info -->
-                <div class="lg:col-span-1">
-                    <div class="rounded-3xl p-6 border border-white/5 bg-[#111111]/80 lg:sticky lg:top-28 backdrop-blur-md">
-                        <div id="detail-image-container" class="h-40 w-full rounded-2xl mb-6 flex items-center justify-center shadow-lg relative overflow-hidden bg-gradient-to-br from-indigo-900 to-purple-900">
-                            <!-- Image injected via JS -->
-                        </div>
-                        <h2 id="detail-name" class="text-2xl md:text-3xl font-black">Game Name</h2>
-                        <p id="detail-publisher" class="text-slate-400 text-sm font-bold tracking-wider mt-1 uppercase">Publisher</p>
-                        <div class="mt-8 space-y-4 text-sm text-slate-400 font-medium">
-                            <div class="flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-red-500/20 bg-white/5 transition"><i data-lucide="zap" class="text-yellow-400 animate-pulse w-4 h-4"></i><span>Proses Otomatis</span></div>
-                            <div class="flex items-center gap-3 p-3 rounded-xl border border-transparent hover:border-red-500/20 bg-white/5 transition"><i data-lucide="smartphone" class="text-blue-400 w-4 h-4"></i><span>Layanan 24 Jam</span></div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Right: Form -->
-                <div class="lg:col-span-2 space-y-6 md:space-y-8">
-                    <!-- 1. ID -->
-                    <div class="rounded-3xl p-6 md:p-8 border border-white/5 bg-[#111111]/80">
-                        <h3 class="text-xl font-bold mb-6">1. Masukkan ID Akun</h3>
-                        <div class="grid grid-cols-2 gap-5">
-                            <div class="col-span-2 md:col-span-1">
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 ml-1">User ID</label>
-                                <input type="number" id="input-userid" placeholder="Ketikan User ID" class="w-full rounded-xl px-5 py-4 font-medium transition outline-none bg-[#0a0a0a] border border-white/10 focus:border-red-500 text-white cursor-text">
-                            </div>
-                            <div class="col-span-2 md:col-span-1" id="input-server-container">
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 ml-1">Zone / Server</label>
-                                <input type="number" id="input-serverid" placeholder="Contoh: (1234)" class="w-full rounded-xl px-5 py-4 font-medium transition outline-none bg-[#0a0a0a] border border-white/10 focus:border-red-500 text-white cursor-text">
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 2. Items -->
-                    <div class="rounded-3xl p-6 md:p-8 border border-white/5 bg-[#111111]/80">
-                        <h3 class="text-xl font-bold mb-6">2. Pilih Nominal</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4" id="detail-items-grid"></div>
-                    </div>
-                    <!-- 3. Payment -->
-                    <div class="rounded-3xl p-6 md:p-8 border border-white/5 bg-[#111111]/80">
-                        <h3 class="text-xl font-bold mb-6">3. Pembayaran</h3>
-                        <div class="space-y-4" id="detail-payment-list"></div>
-                    </div>
-                    <!-- 4. Buy -->
-                    <div class="sticky bottom-6 z-30">
-                        <div class="p-4 md:p-6 rounded-3xl border border-white/5 shadow-2xl backdrop-blur-xl bg-[#111111]/90">
-                            <div class="flex justify-between items-end mb-4 md:mb-6">
-                                <span class="text-xs md:text-sm font-medium text-slate-400">Total Pembayaran</span>
-                                <span id="detail-total-price" class="text-2xl md:text-3xl font-black text-amber-400 tracking-tight">Rp 0</span>
-                            </div>
-                            <button onclick="handleCheckout()" class="w-full py-3 md:py-4 rounded-2xl font-black text-base md:text-lg tracking-wide transition-all duration-300 flex items-center justify-center gap-3 shadow-lg cursor-pointer shimmer-effect relative bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white shadow-red-500/30 hover:-translate-y-1">
-                                <i data-lucide="credit-card" class="w-5 h-5"></i> BELI SEKARANG
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW: ABOUT (Hidden by default) -->
-        <div id="view-about" class="hidden animate-fade-in max-w-4xl mx-auto py-12 px-4">
-            <div class="text-center mb-16">
-                <h2 class="text-4xl md:text-5xl font-black mb-4 tracking-tight">THE STORY OF <span class="text-red-500 relative inline-block">ANOZ</span></h2>
-                <p class="text-slate-400 text-lg max-w-2xl mx-auto">Mengenal lebih dekat sosok di balik brand gaming terpercaya.</p>
-            </div>
-            <div class="rounded-3xl overflow-hidden border border-white/5 relative group hover:shadow-2xl transition-all duration-500 bg-[#111111]/80">
-                <div class="relative z-10 flex flex-col md:flex-row items-center p-8 md:p-12 gap-10">
-                    <div class="flex-shrink-0 relative">
-                        <div class="w-48 h-48 md:w-56 md:h-56 rounded-full p-1.5 bg-gradient-to-br from-red-500 via-yellow-500 to-purple-600 animate-spin-slow">
-                            <div class="w-full h-full rounded-full overflow-hidden border-4 border-[#111]">
-                                <div class="w-full h-full bg-slate-800 flex items-center justify-center text-6xl font-black text-slate-700 select-none">A</div>
-                            </div>
-                        </div>
-                        <div class="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 p-2 rounded-full shadow-lg border-4 border-[#111] animate-bounce-slow"><i data-lucide="crown" class="w-6 h-6 fill-current"></i></div>
-                    </div>
-                    <div class="flex-1 text-center md:text-left space-y-6">
-                        <div>
-                            <h3 class="text-3xl font-black uppercase tracking-wide mb-1">Adisa Nawfal <span class="text-red-500">Zia-ul alam</span></h3>
-                            <div class="inline-block px-4 py-1 rounded-full bg-red-600 text-white text-xs font-bold tracking-widest uppercase mb-4 shadow-lg shadow-red-600/20">Founder & CEO</div>
-                        </div>
-                        <div class="space-y-4 text-slate-400 font-light text-lg">
-                            <p class="leading-relaxed"><span class="font-bold text-red-500 text-xl">"ANOZ"</span> adalah sebuah brand dari sebuah nama individu personal bernama <strong class="text-white">Adisa Nawfal</strong>.</p>
-                            <p class="leading-relaxed">Nama ini sering diplesetin atau akrab dipanggil <strong class="text-white underline decoration-red-500 decoration-2 underline-offset-4">"NOpal"</strong> oleh teman-teman dan komunitasnya.</p>
-                            <p class="leading-relaxed">Dedikasi dan passion di dunia gaming melahirkan <strong>AnozStore</strong>, platform yang bertujuan memberikan kemudahan akses top-up game yang aman, cepat, dan terpercaya bagi seluruh gamers di Indonesia.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW: HISTORY (Hidden by default) -->
-        <div id="view-history" class="hidden animate-fade-in max-w-3xl mx-auto py-16 text-center">
-            <div class="rounded-3xl p-8 md:p-12 border border-white/5 bg-[#111111]/80">
-                <div class="w-20 h-20 md:w-24 md:h-24 bg-red-500/10 rounded-full mx-auto flex items-center justify-center mb-6 md:mb-8 border border-red-500/20 animate-pulse-slow">
-                    <i data-lucide="search" class="text-red-500 w-10 h-10"></i>
-                </div>
-                <h2 class="text-2xl md:text-3xl font-black mb-3">Lacak Pesanan</h2>
-                <p class="text-slate-400 mb-6 md:mb-8 max-w-md mx-auto text-sm md:text-base">Masukkan nomor invoice transaksi kamu untuk melihat status pengiriman secara realtime.</p>
-                <div class="flex flex-col md:flex-row gap-3 max-w-md mx-auto">
-                    <input type="text" placeholder="INV-XXXXXX" class="flex-1 rounded-xl px-5 py-3 outline-none focus:ring-2 focus:ring-red-500 transition bg-[#0a0a0a] border border-white/10 text-white cursor-text">
-                    <button class="bg-red-600 text-white font-bold px-8 py-3 rounded-xl hover:bg-red-500 transition shadow-lg shadow-red-600/20 cursor-pointer">Cek</button>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- FLOATING CHAT -->
-    <a href="https://wa.me/6281234567890" target="_blank" class="fixed bottom-24 right-6 md:bottom-10 md:right-10 z-50 p-4 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition duration-300 animate-float">
-        <i data-lucide="message-circle" class="w-7 h-7 fill-current"></i>
-        <span class="absolute top-0 right-0 -mt-1 -mr-1 flex h-4 w-4">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
-        </span>
-    </a>
-
-    <!-- LIVE NOTIFICATION POPUP -->
-    <div id="live-notif" class="fixed bottom-24 left-6 z-50 p-4 rounded-xl shadow-2xl border border-white/5 backdrop-blur-md flex items-center gap-4 bg-[#111111]/80 max-w-sm hidden">
-        <div id="live-notif-avatar" class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold text-sm shadow-lg animate-pulse-slow">R</div>
-        <div>
-            <p class="text-xs text-slate-400">Baru saja membeli:</p>
-            <p class="font-bold text-sm text-white"><span id="live-notif-item" class="text-green-500">86 Diamonds</span> - <span id="live-notif-game">Mobile Legends</span></p>
-            <p class="text-[10px] text-slate-500">Baru saja</p>
-        </div>
-    </div>
-
-    <!-- FOOTER -->
-    <footer class="border-t border-white/5 mt-20 pb-32 md:pb-12 bg-[#050505]">
-        <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 text-center md:text-left">
-            <div class="col-span-1 md:col-span-2 space-y-4 flex flex-col items-center md:items-start">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-tr from-red-600 to-red-400 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/20">
-                        <i data-lucide="crown" class="text-white w-5 h-5 fill-white"></i>
-                    </div>
-                    <h1 class="text-2xl font-black">ANOZ<span class="text-red-500">STORE</span></h1>
-                </div>
-                <p class="text-sm max-w-sm leading-relaxed text-slate-400">Platform top-up game premium dengan standar keamanan tinggi. Nikmati kemudahan bertransaksi dengan harga kompetitif.</p>
-                <!-- Socials -->
-                <div class="flex items-center gap-4 mt-4">
-                    <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center border border-white/10 bg-white/5 hover:bg-red-600 hover:border-red-600 transition"><i data-lucide="youtube" class="w-4 h-4"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center border border-white/10 bg-white/5 hover:bg-pink-600 hover:border-pink-600 transition"><i data-lucide="instagram" class="w-4 h-4"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center border border-white/10 bg-white/5 hover:bg-indigo-500 hover:border-indigo-500 transition"><i data-lucide="gamepad-2" class="w-4 h-4"></i></a>
-                </div>
-            </div>
-            <div>
-                <h4 class="font-bold mb-4 md:mb-6">Navigasi</h4>
-                <ul class="space-y-3 text-sm text-slate-400">
-                    <li><button onclick="switchTab('home')" class="hover:text-red-500 transition">Beranda Utama</button></li>
-                    <li><button onclick="switchTab('history')" class="hover:text-red-500 transition">Cek Status</button></li>
-                    <li><a href="#" class="hover:text-red-500 transition">Hubungi Support</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-bold mb-4 md:mb-6">Pembayaran Resmi</h4>
-                <div class="flex flex-wrap justify-center md:justify-start gap-2">
-                    <span class="text-[10px] px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-slate-400">QRIS</span>
-                    <span class="text-[10px] px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-slate-400">DANA</span>
-                    <span class="text-[10px] px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-slate-400">OVO</span>
-                    <span class="text-[10px] px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-slate-400">GOPAY</span>
-                    <span class="text-[10px] px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-slate-400">BCA</span>
-                </div>
-            </div>
-        </div>
-        <div class="text-center text-xs py-8 border-t border-white/5 text-slate-600">
-            &copy; 2026 Official AnozStore . All rights reserved.
-        </div>
-    </footer>
-
-    <!-- MOBILE BOTTOM NAV -->
-    <div class="md:hidden fixed bottom-6 left-6 right-6 rounded-2xl border border-white/5 backdrop-blur-xl bg-[#050505]/80 flex justify-around items-center p-4 z-50 shadow-2xl">
-        <button onclick="switchTab('home'); setSelectedGame(null)" class="flex flex-col items-center gap-1 transition text-red-500 scale-110"><i data-lucide="user" class="w-5 h-5"></i></button>
-        <div class="w-14 h-14 bg-gradient-to-tr from-red-600 to-red-500 rounded-full -mt-10 border-[6px] border-[#111] flex items-center justify-center shadow-lg shadow-red-500/40 transform hover:scale-110 transition cursor-pointer">
-            <i data-lucide="shopping-cart" class="text-white w-6 h-6 fill-white"></i>
-        </div>
-        <button onclick="switchTab('history')" class="flex flex-col items-center gap-1 transition text-slate-400 hover:text-red-500"><i data-lucide="search" class="w-5 h-5"></i></button>
-    </div>
-
     <!-- JAVASCRIPT LOGIC -->
     <script>
         // --- DATA ---
-        let banners = [
-            { id: 1, title: "PROMO GAJIAN", subtitle: "Diskon up to 50% untuk semua game!", color: "from-red-600 to-rose-900", imgUrl: "https://i.pinimg.com/originals/e8/34/23/e8342375fa0930704408dc32626e279b.jpg" },
-            { id: 2, title: "NEW ARRIVAL", subtitle: "Top Up Honor of Kings sekarang tersedia.", color: "from-indigo-600 to-blue-900", imgUrl: "" },
-            { id: 3, title: "EVENT SPESIAL", subtitle: "Bonus Diamond setiap pembelian via QRIS.", color: "from-emerald-600 to-teal-900", imgUrl: "" }
+        const banners = [
+            { id: 1, title: "PROMO GAJIAN", subtitle: "Diskon up to 50% untuk semua game!", color: "from-red-600 to-rose-900", icon: "zap" },
+            { id: 2, title: "NEW ARRIVAL", subtitle: "Top Up Honor of Kings sekarang tersedia.", color: "from-indigo-600 to-blue-900", icon: "star" },
+            { id: 3, title: "EVENT SPESIAL", subtitle: "Bonus Diamond setiap pembelian via QRIS.", color: "from-emerald-600 to-teal-900", icon: "crown" }
         ];
 
-        let games = [
+        const games = [
             { id: 1, category: 'game', name: 'Mobile Legends', publisher: 'Moonton', imgUrl: 'https://i.pinimg.com/1200x/d6/23/8e/d6238e6d724fddec242eaf389b67815a.jpg', image: 'bg-gradient-to-br from-indigo-900 to-purple-900', icon: 'M', items: [{ id: 'ml1', name: '86 Diamonds', price: 20000 }] },
             { id: 2, category: 'game', name: 'Free Fire', publisher: 'Garena', imgUrl: 'https://i.pinimg.com/736x/f2/3c/95/f23c95ed4421952cac128d0560ea1b73.jpg', image: 'bg-gradient-to-br from-orange-800 to-red-900', icon: 'F', items: [{ id: 'ff1', name: '70 Diamonds', price: 10000 }] },
             { id: 3, category: 'game', name: 'PUBG Mobile', publisher: 'Tencent', imgUrl: 'https://i.pinimg.com/1200x/5e/68/e4/5e68e4a0cbe4a056aca1c33c5c6dcbbc.jpg', image: 'bg-gradient-to-br from-yellow-800 to-amber-900', icon: 'P', items: [{ id: 'pm1', name: '60 UC', price: 14000 }] },
@@ -493,338 +143,587 @@
         ];
 
         const payments = [
-            { id: 'qris', name: 'QRIS', fee: 0 },
-            { id: 'dana', name: 'DANA', fee: 0 },
-            { id: 'gopay', name: 'GoPay', fee: 1000 },
-            { id: 'ovo', name: 'OVO', fee: 1000 },
-            { id: 'va', name: 'VA', fee: 2500 }
-        ];
-
-        const stats = [
-            { label: "Transaksi Sukses", value: 99.9, suffix: "%" },
-            { label: "Total Transaksi", value: 50000, suffix: "+" },
-            { label: "Pelanggan Puas", value: 10000, suffix: "+" },
-            { label: "Layanan Aktif", value: 24, suffix: "/7" }
+            { id: 'qris', name: 'QRIS (All Payment)', fee: 0, icon: 'qr-code' },
+            { id: 'dana', name: 'DANA', fee: 0, icon: 'wallet' },
+            { id: 'gopay', name: 'GoPay', fee: 1000, icon: 'wallet' },
+            { id: 'ovo', name: 'OVO', fee: 1000, icon: 'wallet' },
+            { id: 'va', name: 'Virtual Account', fee: 2500, icon: 'landmark' },
         ];
 
         const testimonials = [
-            { name: "Sultan Andara", role: "Mobile Legends", quote: "Gila sih, top up jam 3 pagi masuknya itungan detik." },
-            { name: "Pro Player FF", role: "Free Fire", quote: "Harga termurah se-Indonesia, adminnya juga fast respon parah." },
-            { name: "Wibu Elite", role: "Genshin Impact", quote: "Buat gacha Aman banget, legal 100%. Nggak takut minus." }
+            { id: 1, name: "Sultan Andara", role: "Mobile Legends Player", quote: "Gila sih, top up jam 3 pagi masuknya itungan detik. Recommended banget!", rating: 5 },
+            { id: 2, name: "Pro Player FF", role: "Free Fire User", quote: "Harga termurah se-Indonesia, adminnya juga fast respon parah.", rating: 5 },
+            { id: 3, name: "Wibu Elite", role: "Genshin Impact", quote: "Buat gacha Aman banget, legal 100%. Nggak takut minus.", rating: 5 },
         ];
 
         const faqs = [
-            { q: "Apakah layanan ini buka 24 jam?", a: "Ya, sistem kami beroperasi otomatis 24 jam non-stop." },
-            { q: "Berapa lama proses masuknya?", a: "Estimasi proses 1-5 detik untuk Normal, dan maksimal 10 menit jika server padat." }
+            { id: 1, q: "Apakah layanan ini buka 24 jam?", a: "Ya, sistem kami beroperasi otomatis 24 jam non-stop." },
+            { id: 2, q: "Berapa lama proses masuknya?", a: "Estimasi proses 1-5 detik untuk Normal, dan maksimal 10 menit jika padat." },
+            { id: 3, q: "Apa yang harus dilakukan jika gagal?", a: "Dana akan otomatis dikembalikan atau hubungi CS kami." },
+            { id: 4, q: "Metode pembayaran apa saja?", a: "QRIS, E-Wallet (Dana, Ovo, ShopeePay), Transfer Bank, dan Virtual Account." }
         ];
 
-        // --- STATE ---
+        const stats = [
+            { id: 1, label: "Transaksi Sukses", value: "99.9%", icon: "check" },
+            { id: 2, label: "Total Transaksi", value: "50k+", icon: "activity" },
+            { id: 3, label: "Pelanggan Puas", value: "10k+", icon: "users" },
+            { id: 4, label: "Layanan Aktif", value: "24/7", icon: "clock" },
+        ];
+
+        const categories = [
+            { id: 'all', label: 'Semua' },
+            { id: 'game', label: 'Games' },
+            { id: 'voucher', label: 'Voucher' },
+            { id: 'app', label: 'App' },
+        ];
+
+        // --- STATE MANAGEMENT ---
         let state = {
             activeTab: 'home',
+            selectedGame: null,
+            searchQuery: '',
+            isDarkMode: true,
+            isMenuOpen: false,
             currentBanner: 0,
             selectedCategory: 'all',
-            isDarkMode: true,
-            selectedGame: null,
-            selectedItem: null,
-            selectedPayment: null,
-            userId: '',
-            serverId: ''
-        };
-
-        // --- DOM ELEMENTS ---
-        const els = {
-            bannerContainer: document.getElementById('banner-container'),
-            gameGrid: document.getElementById('game-grid'),
-            categoryTabs: document.getElementById('category-tabs'),
-            flashSaleGrid: document.getElementById('flash-sale-grid'),
-            statsContainer: document.getElementById('stats-container'),
-            testimonialsGrid: document.getElementById('testimonials-grid'),
-            faqContainer: document.getElementById('faq-container'),
-            views: {
-                home: document.getElementById('view-home'),
-                detail: document.getElementById('view-detail'),
-                about: document.getElementById('view-about'),
-                history: document.getElementById('view-history')
+            timeLeft: 7200,
+            liveNotif: null,
+            activeFaq: null,
+            checkout: {
+                userId: '',
+                serverId: '',
+                selectedItem: null,
+                selectedPayment: null
             }
         };
 
-        // --- INIT ---
-        function init() {
-            renderBanners();
-            renderCategories();
-            renderGames();
-            renderFlashSale();
-            renderStats();
-            renderTestimonials();
-            renderFaqs();
-            lucide.createIcons();
-            
-            // Custom Cursor Logic
-            document.addEventListener('mousemove', (e) => {
-                const cursorMain = document.getElementById('cursor-main');
-                const cursorDot = document.getElementById('cursor-dot');
-                if (cursorMain) cursorMain.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-                if (cursorDot) cursorDot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
-            });
+        // --- THEME CONFIG ---
+        const getTheme = () => state.isDarkMode ? {
+            bg: "bg-[#050505]", text: "text-slate-100", textMuted: "text-slate-400", card: "bg-[#111111]/80 border-white/5",
+            nav: "bg-[#050505]/80 border-white/5", accent: "text-red-500", border: "border-red-900/30",
+            input: "bg-[#0a0a0a] border-white/10 text-white focus:border-red-500", priceText: "text-amber-400"
+        } : {
+            bg: "bg-rose-50/50", text: "text-slate-900", textMuted: "text-slate-500", card: "bg-white/80 border-red-100 shadow-sm",
+            nav: "bg-white/80 border-red-100", accent: "text-red-600", border: "border-red-200",
+            input: "bg-white border-red-100 text-slate-900 focus:border-red-500", priceText: "text-red-700"
+        };
 
-            // Start Timers
-            setInterval(() => {
-                state.currentBanner = (state.currentBanner + 1) % banners.length;
-                renderBanners();
-            }, 5000);
+        // --- UTILS ---
+        const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+        const formatTime = (seconds) => {
+            const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${h} : ${m} : ${s}`;
+        };
 
-            startFlashSaleTimer();
-            startLiveNotif();
+        // --- ACTIONS ---
+        function setState(newState) {
+            state = { ...state, ...newState };
+            render();
         }
 
-        // --- RENDER FUNCTIONS ---
-        function renderBanners() {
-            const banner = banners[state.currentBanner];
-            els.bannerContainer.innerHTML = `
-                <div class="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out flex flex-col justify-center items-center md:items-start md:px-20 text-center md:text-left">
-                    <div class="absolute inset-0 bg-gradient-to-r ${banner.color} opacity-90"></div>
-                    ${banner.imgUrl ? `<img src="${banner.imgUrl}" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-60">` : ''}
-                    <div class="relative z-20 max-w-2xl animate-fade-in-up">
-                        <div class="flex items-center justify-center md:justify-start gap-4 mb-4">
-                            <span class="bg-white/10 px-3 py-1 rounded-full text-xs font-bold text-white tracking-widest border border-white/20 uppercase">Official Promo</span>
+        // NEW: Specific Action for Banner to prevent full re-render
+        function navigateBanner(newIndex) {
+            state.currentBanner = newIndex;
+            const wrapper = document.getElementById('banner-wrapper');
+            // If the wrapper exists, just update its content (Prevent Page Reload effect)
+            if (wrapper) {
+                wrapper.innerHTML = RenderBanner();
+                lucide.createIcons({ root: wrapper });
+            } else {
+                // If wrapper doesn't exist (maybe not on home tab), do full render
+                render();
+            }
+        }
+
+        function setCheckout(key, value) {
+            state.checkout = { ...state.checkout, [key]: value };
+            render();
+        }
+
+        function toggleTheme() {
+            setState({ isDarkMode: !state.isDarkMode });
+            document.body.className = state.isDarkMode ? 'bg-[#050505] text-slate-100' : 'bg-rose-50 text-slate-900';
+        }
+
+        function handleCheckoutAction() {
+            const { userId, serverId, selectedItem, selectedPayment } = state.checkout;
+            if (!userId || !selectedItem || !selectedPayment) {
+                showToast('Mohon lengkapi data pesanan!', 'error');
+                return;
+            }
+            const total = selectedItem.price + selectedPayment.fee;
+            const msg = `Halo Admin AnozStore! 👋\n\nSaya ingin order:\n🎮 Game: *${state.selectedGame.name}*\n🆔 ID: *${userId}* ${serverId ? `(${serverId})` : ''}\n💎 Item: *${selectedItem.name}*\n💳 Bayar: *${selectedPayment.name}*\n💰 Total: *${formatRupiah(total)}*`;
+            window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(msg)}`, '_blank');
+            showToast('Mengarahkan ke WhatsApp...', 'success');
+        }
+
+        function showToast(msg, type) {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 animate-bounce ${type === 'error' ? 'bg-red-600 text-white' : 'bg-emerald-500 text-white'}`;
+            toast.innerHTML = `<i data-lucide="${type === 'error' ? 'x' : 'check'}" width="20"></i> <span class="font-bold text-sm">${msg}</span>`;
+            document.body.appendChild(toast);
+            lucide.createIcons();
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // --- COMPONENTS (RENDER FUNCTIONS) ---
+        
+        function RenderNavbar() {
+            const t = getTheme();
+            return `
+            <div class="w-full py-2 overflow-hidden z-50 relative ${state.isDarkMode ? 'bg-red-900/20 text-red-200' : 'bg-red-600 text-white'}">
+                <div class="flex animate-scroll whitespace-nowrap gap-10">
+                   <div class="flex items-center gap-10 text-xs font-bold tracking-widest uppercase">
+                     <span>⚡ Welcome to Official AnozStore!</span><span>🛡️ Layanan Top Up 24 Jam</span><span>⚠️ Hati-hati penipuan!</span><span>🔥 Promo Gajian!</span>
+                   </div>
+                   <div class="flex items-center gap-10 text-xs font-bold tracking-widest uppercase">
+                     <span>⚡ Welcome to Official AnozStore!</span><span>🛡️ Layanan Top Up 24 Jam</span><span>⚠️ Hati-hati penipuan!</span><span>🔥 Promo Gajian!</span>
+                   </div>
+                </div>
+            </div>
+            
+            <nav class="sticky top-0 z-40 backdrop-blur-xl border-b transition-colors duration-500 ${t.nav}">
+                <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+                    <div class="flex items-center gap-3 cursor-pointer group" onclick="setState({activeTab: 'home', selectedGame: null})">
+                        <div class="w-10 h-10 bg-gradient-to-tr from-red-600 to-red-400 rounded-xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition">
+                            <i data-lucide="crown" class="text-white"></i>
                         </div>
-                        <h2 class="text-4xl md:text-6xl font-black text-white leading-tight drop-shadow-lg mb-2">${banner.title}</h2>
-                        <p class="text-white/80 text-lg md:text-xl font-medium mb-8">${banner.subtitle}</p>
+                        <div>
+                            <h1 class="text-2xl font-black tracking-tighter leading-none">ANOZ<span class="${t.accent}">STORE</span></h1>
+                            <p class="text-[10px] font-bold tracking-widest uppercase ${t.textMuted}">Official Gaming Shop</p>
+                        </div>
+                    </div>
+                    
+                    <div class="hidden md:flex items-center gap-8">
+                        <button onclick="setState({activeTab:'home', selectedGame:null})" class="${state.activeTab === 'home' && !state.selectedGame ? t.accent : 'text-slate-400 hover:text-red-500'} font-bold text-sm tracking-wide transition">BERANDA</button>
+                        <button onclick="setState({activeTab:'history'})" class="${state.activeTab === 'history' ? t.accent : 'text-slate-400 hover:text-red-500'} font-bold text-sm tracking-wide transition">RIWAYAT</button>
+                        <button onclick="setState({activeTab:'about'})" class="${state.activeTab === 'about' ? t.accent : 'text-slate-400 hover:text-red-500'} font-bold text-sm tracking-wide transition">TENTANG</button>
+                        <button onclick="toggleTheme()" class="w-10 h-10 rounded-full flex items-center justify-center border transition ${state.isDarkMode ? 'bg-slate-800 border-slate-700 text-yellow-400' : 'bg-red-50 border-red-200 text-red-600'}">
+                            <i data-lucide="${state.isDarkMode ? 'sun' : 'moon'}" width="20"></i>
+                        </button>
+                    </div>
+
+                    <div class="md:hidden flex gap-4">
+                        <button onclick="toggleTheme()" class="${state.isDarkMode ? 'text-yellow-400' : 'text-red-600'}"><i data-lucide="${state.isDarkMode ? 'sun' : 'moon'}" width="24"></i></button>
                     </div>
                 </div>
+            </nav>
             `;
         }
 
-        function renderCategories() {
-            const categories = [{id: 'all', label: 'Semua'}, {id: 'game', label: 'Games'}, {id: 'voucher', label: 'Voucher'}, {id: 'app', label: 'App'}];
-            els.categoryTabs.innerHTML = categories.map(cat => `
-                <button onclick="setCategory('${cat.id}')" class="px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-300 border cursor-pointer flex items-center gap-2 ${state.selectedCategory === cat.id ? 'bg-red-600 border-red-600 text-white shadow-lg' : 'bg-white/5 text-slate-400 border-white/10 hover:border-red-500 hover:text-red-500'}">
-                    ${cat.label}
-                </button>
-            `).join('');
-        }
-
-        function renderGames() {
-            const filtered = games.filter(g => state.selectedCategory === 'all' || g.category === state.selectedCategory);
-            els.gameGrid.innerHTML = filtered.map((game, idx) => `
-                <div onclick="selectGame(${game.id})" class="group relative rounded-2xl overflow-hidden cursor-pointer border border-white/5 bg-[#111111]/80 hover:-translate-y-2 transition-all duration-300 shadow-lg" style="animation: fadeInUp 0.6s ease-out forwards ${idx * 0.05}s; opacity: 0;">
-                    <div class="h-32 md:h-40 w-full relative overflow-hidden flex items-center justify-center ${game.image} ${!game.imgUrl ? 'bg-gradient-to-br from-indigo-900 to-purple-900' : ''}">
-                        ${game.imgUrl ? `<img src="${game.imgUrl}" class="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110">` : `<span class="text-5xl font-black text-white/20 select-none">${game.icon}</span>`}
-                    </div>
-                    <div class="p-4 relative z-10">
-                        <h4 class="font-bold text-sm md:text-base truncate text-slate-100 group-hover:text-red-500 transition">${game.name}</h4>
-                        <p class="text-[10px] md:text-xs text-slate-400 mt-1 font-medium">${game.publisher}</p>
+        function RenderBanner() {
+            const t = getTheme();
+            const b = banners[state.currentBanner];
+            return `
+            <div class="relative rounded-3xl overflow-hidden mb-8 border ${t.border} shadow-2xl group h-[300px] md:h-[350px]">
+                <button onclick="navigateBanner(${state.currentBanner === 0 ? banners.length - 1 : state.currentBanner - 1})" class="absolute left-4 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-black/20 text-white backdrop-blur border border-white/10 hover:bg-black/50 transition opacity-0 group-hover:opacity-100"><i data-lucide="chevron-left"></i></button>
+                <button onclick="navigateBanner(${(state.currentBanner + 1) % banners.length})" class="absolute right-4 top-1/2 -translate-y-1/2 z-40 p-3 rounded-full bg-black/20 text-white backdrop-blur border border-white/10 hover:bg-black/50 transition opacity-0 group-hover:opacity-100"><i data-lucide="chevron-right"></i></button>
+                
+                <div class="absolute inset-0 w-full h-full flex flex-col justify-center items-center md:items-start md:px-20 text-center md:text-left transition-all duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-r ${b.color} opacity-90"></div>
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 mix-blend-overlay"></div>
+                    <div class="relative z-20 max-w-2xl animate-fade-in-up">
+                         <div class="flex items-center justify-center md:justify-start gap-4 mb-4">
+                            <div class="p-3 bg-white/10 backdrop-blur rounded-full border border-white/20 animate-float"><i data-lucide="${b.icon}" class="text-yellow-400 fill-yellow-400"></i></div>
+                            <span class="bg-white/10 px-3 py-1 rounded-full text-xs font-bold text-white tracking-widest border border-white/20 uppercase">Official Promo</span>
+                        </div>
+                        <h2 class="text-4xl md:text-6xl font-black text-white leading-tight drop-shadow-lg mb-2">${b.title}</h2>
+                        <p class="text-white/80 text-lg md:text-xl font-medium mb-8">${b.subtitle}</p>
                     </div>
                 </div>
-            `).join('');
+                
+                <div class="absolute bottom-6 left-0 right-0 z-30 flex justify-center gap-2">
+                    ${banners.map((_, i) => `<div onclick="navigateBanner(${i})" class="h-2 rounded-full cursor-pointer transition-all duration-300 ${i === state.currentBanner ? 'w-8 bg-white' : 'w-2 bg-white/40'}"></div>`).join('')}
+                </div>
+            </div>`;
         }
 
-        function renderFlashSale() {
+        function RenderFlashSale() {
+            const t = getTheme();
             const items = [
-                {name: '172 Diamonds', game: 'Mobile Legends', price: '40.000', promo: '35.000', img: 'bg-indigo-900'},
-                {name: '60 UC', game: 'PUBG Mobile', price: '14.000', promo: '12.500', img: 'bg-yellow-800'},
-                {name: 'Weekly Pass', game: 'Mobile Legends', price: '28.000', promo: '24.500', img: 'bg-blue-900'},
-                {name: 'Welkin Moon', game: 'Genshin Impact', price: '79.000', promo: '69.000', img: 'bg-purple-900'}
+                {name: '172 Diamonds', game: 'Mobile Legends', price: 40000, promo: 35000, img: 'bg-indigo-900'},
+                {name: '60 UC', game: 'PUBG Mobile', price: 14000, promo: 12500, img: 'bg-yellow-800'},
+                {name: 'Weekly Pass', game: 'Mobile Legends', price: 28000, promo: 24500, img: 'bg-blue-900'},
+                {name: 'Welkin Moon', game: 'Genshin Impact', price: 79000, promo: 69000, img: 'bg-purple-900'},
             ];
-            els.flashSaleGrid.innerHTML = items.map(item => `
-                <div class="p-4 rounded-2xl border border-white/5 relative overflow-hidden bg-[#111111]/80 hover:border-red-500/50 transition">
-                    <div class="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg z-10 animate-pulse">HEMAT 15%</div>
-                    <div class="h-24 rounded-xl ${item.img} mb-3 flex items-center justify-center"><i data-lucide="zap" class="text-white/50 w-6 h-6"></i></div>
-                    <h4 class="font-bold text-sm text-white">${item.name}</h4>
-                    <p class="text-[10px] text-slate-500">${item.game}</p>
-                    <div class="mt-2"><p class="text-[10px] text-slate-400 line-through">Rp ${item.price}</p><p class="text-red-500 font-bold text-sm">Rp ${item.promo}</p></div>
+            return `
+            <div class="mb-12">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2"><i data-lucide="zap" class="text-yellow-400 fill-yellow-400 animate-pulse"></i><h3 class="text-xl font-black italic tracking-tighter ${t.text}">FLASH SALE</h3></div>
+                    <div class="flex items-center gap-2 bg-red-600 px-3 py-1 rounded-lg text-white font-mono font-bold text-sm animate-pulse-slow"><i data-lucide="clock" width="16"></i><span>${formatTime(state.timeLeft)}</span></div>
                 </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        function renderStats() {
-            els.statsContainer.innerHTML = stats.map((stat, i) => `
-                <div class="text-center" style="animation: fadeInUp 0.5s ease-out forwards ${i * 0.2}s; opacity: 0;">
-                    <div class="inline-flex p-3 rounded-full bg-red-600/10 text-red-500 mb-3 animate-pulse-slow"><i data-lucide="activity" class="w-6 h-6"></i></div>
-                    <h3 class="text-2xl md:text-3xl font-black text-amber-400">${stat.value}${stat.suffix}</h3>
-                    <p class="text-xs md:text-sm uppercase tracking-widest font-bold text-slate-400 mt-1">${stat.label}</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    ${items.map((item, i) => `
+                        <div class="p-4 rounded-2xl border relative overflow-hidden group cursor-pointer ${t.card} hover:border-red-500/50 hover:shadow-lg transition transform hover:-translate-y-1" style="animation: fadeInUp 0.6s ease-out forwards ${i * 0.1}s; opacity: 0;">
+                            <div class="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg z-10 animate-pulse">HEMAT ${Math.round(((item.price - item.promo)/item.price)*100)}%</div>
+                            <div class="h-24 rounded-xl ${item.img} mb-3 flex items-center justify-center"><i data-lucide="zap" class="text-white/50"></i></div>
+                            <h4 class="font-bold text-sm ${t.text}">${item.name}</h4>
+                            <p class="text-[10px] text-slate-500">${item.game}</p>
+                            <div class="mt-2"><p class="text-[10px] text-slate-400 line-through">Rp ${item.price.toLocaleString()}</p><p class="text-red-500 font-bold text-sm">Rp ${item.promo.toLocaleString()}</p></div>
+                        </div>
+                    `).join('')}
                 </div>
-            `).join('');
-            lucide.createIcons();
+            </div>`;
         }
 
-        function renderTestimonials() {
-            els.testimonialsGrid.innerHTML = testimonials.map((t, i) => `
-                <div class="p-6 rounded-2xl border border-white/5 bg-[#111111]/80 transition hover:-translate-y-2" style="animation: fadeInUp 0.5s ease-out forwards ${i * 0.2}s; opacity: 0;">
-                    <div class="flex items-center gap-1 mb-4 text-yellow-400"><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i><i data-lucide="star" class="w-3 h-3 fill-current"></i></div>
-                    <p class="text-sm italic mb-6 leading-relaxed text-slate-400">"${t.quote}"</p>
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white">${t.name.charAt(0)}</div>
-                        <div><h4 class="font-bold text-sm text-white">${t.name}</h4><p class="text-[10px] text-red-500 font-bold uppercase">${t.role}</p></div>
-                    </div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        function renderFaqs() {
-            els.faqContainer.innerHTML = faqs.map((f, i) => `
-                <div class="rounded-2xl border border-white/5 bg-[#111111]/80 overflow-hidden cursor-pointer" onclick="this.lastElementChild.classList.toggle('hidden')">
-                    <div class="p-5 flex justify-between items-center"><h4 class="font-bold text-sm md:text-base text-white">${f.q}</h4><i data-lucide="chevron-down" class="text-slate-400 w-4 h-4"></i></div>
-                    <div class="px-5 pb-5 text-sm text-slate-400 leading-relaxed hidden">${f.a}</div>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
-
-        // --- ACTIONS ---
-        function switchTab(tab) {
-            state.activeTab = tab;
-            Object.values(els.views).forEach(el => el.classList.add('hidden'));
-            els.views[tab].classList.remove('hidden');
-            window.scrollTo(0, 0);
-        }
-
-        function setCategory(id) {
-            state.selectedCategory = id;
-            renderCategories();
-            renderGames();
-        }
-
-        function selectGame(id) {
-            state.selectedGame = games.find(g => g.id === id);
-            state.selectedItem = null;
-            state.selectedPayment = null;
-            state.userId = '';
-            state.serverId = '';
+        function RenderGameGrid() {
+            const t = getTheme();
+            const filtered = games.filter(g => 
+                g.name.toLowerCase().includes(state.searchQuery.toLowerCase()) && 
+                (state.selectedCategory === 'all' || g.category === state.selectedCategory)
+            );
             
-            // Populate Detail View
-            document.getElementById('detail-name').innerText = state.selectedGame.name;
-            document.getElementById('detail-publisher').innerText = state.selectedGame.publisher;
-            const imgContainer = document.getElementById('detail-image-container');
-            if(state.selectedGame.imgUrl) {
-                imgContainer.innerHTML = `<img src="${state.selectedGame.imgUrl}" class="absolute inset-0 w-full h-full object-cover">`;
-            } else {
-                imgContainer.innerHTML = `<span class="text-8xl font-black text-white/30 relative z-10">${state.selectedGame.icon}</span>`;
-            }
+            return `
+            <div class="flex items-center justify-between mb-6">
+               <div class="flex items-center gap-3">
+                 <div class="p-2 rounded-lg ${state.isDarkMode ? 'bg-red-500/10' : 'bg-red-100'}"><i data-lucide="star" class="text-red-500 fill-red-500"></i></div>
+                 <h3 class="text-2xl font-black tracking-tight ${t.text}">SEMUA PRODUK</h3>
+               </div>
+               <div class="relative group">
+                  <input type="text" placeholder="Cari game..." oninput="setState({searchQuery: this.value})" value="${state.searchQuery}" class="bg-transparent border ${t.border} text-sm rounded-full pl-5 pr-10 py-2.5 focus:outline-none focus:border-red-500 transition w-32 md:w-56 ${t.text}">
+                  <i data-lucide="search" class="absolute right-4 top-2.5 ${t.textMuted} w-4"></i>
+               </div>
+            </div>
 
-            // Render Items
-            document.getElementById('detail-items-grid').innerHTML = state.selectedGame.items.map(item => `
-                <div onclick="selectItem('${item.id}', ${item.price}, '${item.name}')" class="cursor-pointer p-4 rounded-2xl border transition relative overflow-hidden ${state.selectedItem?.id === item.id ? 'bg-red-500/10 border-red-500' : 'border-white/5 bg-[#111111]/80 hover:border-red-400'}">
-                    <h4 class="font-bold text-sm text-white">${item.name}</h4>
-                    <p class="text-amber-400 text-xs mt-2 font-bold">Rp ${new Intl.NumberFormat('id-ID').format(item.price)}</p>
-                </div>
-            `).join('');
+            <div class="flex flex-wrap gap-2 mb-8 animate-fade-in-up">
+                ${categories.map(cat => `
+                    <button onclick="setState({selectedCategory: '${cat.id}'})" class="px-6 py-2.5 rounded-full font-bold text-sm transition border flex items-center gap-2 ${state.selectedCategory === cat.id ? 'bg-red-600 border-red-600 text-white shadow-lg' : `${t.card} ${t.textMuted} hover:border-red-500 hover:text-red-500`}">
+                       ${state.selectedCategory === cat.id ? '<i data-lucide="check" width="14" stroke-width="4"></i>' : ''} ${cat.label}
+                    </button>
+                `).join('')}
+            </div>
 
-            // Render Payments
-            document.getElementById('detail-payment-list').innerHTML = payments.map(pay => `
-                <div onclick="selectPayment('${pay.id}', ${pay.fee}, '${pay.name}')" class="flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition ${state.selectedPayment?.id === pay.id ? 'bg-red-500/5 border-red-500' : 'border-white/5 bg-[#111111]/80 hover:border-red-400'}">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-900 font-black text-[10px]">${pay.name.substring(0,4)}</div>
-                        <div><h4 class="font-bold text-sm text-white">${pay.name}</h4></div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6 min-h-[400px]">
+                ${filtered.map((g, i) => `
+                    <div onclick="setState({selectedGame: ${g.id}, checkout: {userId:'', serverId:'', selectedItem:null, selectedPayment:null}})" class="group relative rounded-2xl overflow-hidden cursor-pointer border backdrop-blur-sm transition-all duration-300 transform hover:-translate-y-2 ${t.card} hover:border-red-500/50" style="animation: fadeInUp 0.6s ease-out forwards ${i * 0.05}s; opacity: 0;">
+                        <div class="h-32 md:h-40 w-full ${g.image} flex items-center justify-center relative overflow-hidden">
+                            ${g.imgUrl ? `<img src="${g.imgUrl}" alt="${g.name}" class="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110">` : `<span class="text-5xl font-black text-white/20 select-none">${g.icon}</span>`}
+                            <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition duration-500"></div>
+                        </div>
+                        <div class="p-4 md:p-5 relative z-10">
+                            <h4 class="font-bold text-sm md:text-base truncate ${t.text} group-hover:text-red-500 transition">${g.name}</h4>
+                            <p class="text-[10px] md:text-xs ${t.textMuted} mt-1 font-medium">${g.publisher}</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>`;
+        }
+
+        function RenderGameDetail() {
+            const t = getTheme();
+            const g = games.find(game => game.id === state.selectedGame);
+            const { checkout } = state;
+            
+            return `
+            <div class="max-w-5xl mx-auto animate-fade-in pt-8">
+                <button onclick="setState({selectedGame: null})" class="flex items-center ${t.textMuted} hover:${t.accent} mb-8 group font-bold tracking-wide transition">
+                    <div class="p-2 rounded-full mr-3 border ${t.border} group-hover:bg-red-500 group-hover:text-white transition"><i data-lucide="chevron-left" width="20"></i></div> Kembali
+                </button>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10">
+                    <!-- Info -->
+                    <div class="lg:col-span-1">
+                        <div class="rounded-3xl p-6 border ${t.card} lg:sticky lg:top-28 backdrop-blur-md animate-fade-in-up">
+                             <div class="h-40 w-full rounded-2xl ${g.image} mb-6 flex items-center justify-center shadow-lg relative overflow-hidden">
+                                ${g.imgUrl ? `<img src="${g.imgUrl}" class="absolute inset-0 w-full h-full object-cover">` : `<span class="text-8xl font-black text-white/30">${g.icon}</span>`}
+                             </div>
+                             <h2 class="text-2xl md:text-3xl font-black ${t.text}">${g.name}</h2>
+                             <p class="${t.textMuted} text-sm font-bold tracking-wider mt-1 uppercase">${g.publisher}</p>
+                             <div class="mt-8 space-y-4 text-sm ${t.textMuted} font-medium">
+                                <div class="flex items-center gap-3 p-3 rounded-xl bg-white/5"><i data-lucide="zap" class="text-yellow-400 animate-pulse"></i><span>Proses Otomatis</span></div>
+                                <div class="flex items-center gap-3 p-3 rounded-xl bg-white/5"><i data-lucide="smartphone" class="text-blue-400"></i><span>Layanan 24 Jam</span></div>
+                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form -->
+                    <div class="lg:col-span-2 space-y-6 md:space-y-8">
+                        <!-- 1. Input -->
+                        <div class="rounded-3xl p-6 border ${t.card} animate-fade-in-up" style="animation-delay: 0.1s">
+                            <div class="flex items-center gap-4 mb-6">
+                                <span class="bg-gradient-to-br from-red-500 to-red-700 text-white w-10 h-10 flex items-center justify-center rounded-xl font-bold text-lg shadow-lg">1</span>
+                                <h3 class="text-xl font-bold ${t.text}">Masukkan ID Akun</h3>
+                            </div>
+                            <div class="grid grid-cols-2 gap-5">
+                                <div class="col-span-2 ${g.name === 'Mobile Legends' || g.name === 'Genshin Impact' ? 'md:col-span-1' : ''}">
+                                    <label class="block text-xs font-bold uppercase ${t.textMuted} mb-3 ml-1">User ID</label>
+                                    <input type="number" placeholder="Ketikan User ID" class="w-full rounded-xl px-5 py-4 font-medium transition outline-none ${t.input}" value="${checkout.userId}" oninput="setCheckout('userId', this.value)">
+                                </div>
+                                ${(g.name === 'Mobile Legends' || g.name === 'Genshin Impact') ? `
+                                <div class="col-span-2 md:col-span-1">
+                                    <label class="block text-xs font-bold uppercase ${t.textMuted} mb-3 ml-1">Zone ID</label>
+                                    <input type="number" placeholder="(1234)" class="w-full rounded-xl px-5 py-4 font-medium transition outline-none ${t.input}" value="${checkout.serverId}" oninput="setCheckout('serverId', this.value)">
+                                </div>` : ''}
+                            </div>
+                        </div>
+
+                        <!-- 2. Item -->
+                        <div class="rounded-3xl p-6 border ${t.card} animate-fade-in-up" style="animation-delay: 0.2s">
+                            <div class="flex items-center gap-4 mb-6"><span class="bg-gradient-to-br from-red-500 to-red-700 text-white w-10 h-10 flex items-center justify-center rounded-xl font-bold text-lg shadow-lg">2</span><h3 class="text-xl font-bold ${t.text}">Pilih Nominal</h3></div>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                ${g.items.map(item => `
+                                    <div onclick="setCheckout('selectedItem', {id:'${item.id}', name:'${item.name}', price:${item.price}})" class="cursor-pointer p-4 rounded-2xl border transition relative overflow-hidden group ${checkout.selectedItem?.id === item.id ? 'bg-red-500/10 border-red-500 ring-1 ring-red-500' : `${t.bg} ${t.border} hover:border-red-400`}">
+                                        <h4 class="font-bold text-xs md:text-sm ${t.text}">${item.name}</h4>
+                                        <p class="${t.priceText} text-xs mt-2 font-bold">Rp ${item.price.toLocaleString()}</p>
+                                        ${checkout.selectedItem?.id === item.id ? '<div class="absolute top-0 right-0 p-1.5 bg-red-500 rounded-bl-xl"><i data-lucide="check" class="text-white" width="14"></i></div>' : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- 3. Payment -->
+                        <div class="rounded-3xl p-6 border ${t.card} animate-fade-in-up" style="animation-delay: 0.3s">
+                            <div class="flex items-center gap-4 mb-6"><span class="bg-gradient-to-br from-red-500 to-red-700 text-white w-10 h-10 flex items-center justify-center rounded-xl font-bold text-lg shadow-lg">3</span><h3 class="text-xl font-bold ${t.text}">Pembayaran</h3></div>
+                            <div class="space-y-4">
+                                ${payments.map(pay => `
+                                    <div onclick="setCheckout('selectedPayment', {id:'${pay.id}', name:'${pay.name}', fee:${pay.fee}})" class="flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition ${checkout.selectedPayment?.id === pay.id ? 'bg-red-500/5 border-red-500 ring-1 ring-red-500' : `${t.bg} ${t.border} hover:border-red-400`}">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-900 shadow-sm border"><i data-lucide="${pay.icon}" width="20"></i></div>
+                                            <div><h4 class="font-bold text-xs md:text-sm ${t.text}">${pay.name}</h4></div>
+                                        </div>
+                                        ${checkout.selectedItem ? `<div class="text-right"><p class="font-bold ${t.priceText} text-xs">Rp ${(checkout.selectedItem.price + pay.fee).toLocaleString()}</p></div>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Checkout Button -->
+                        <div class="sticky bottom-6 z-30 animate-fade-in-up" style="animation-delay: 0.4s">
+                            <div class="p-4 md:p-6 rounded-3xl border ${t.border} shadow-2xl backdrop-blur-xl ${state.isDarkMode ? 'bg-[#111]/90' : 'bg-white/90'}">
+                                <div class="flex justify-between items-end mb-4">
+                                    <span class="text-xs font-medium ${t.textMuted}">Total Pembayaran</span>
+                                    <span class="text-2xl font-black ${t.accent}">${checkout.selectedItem && checkout.selectedPayment ? formatRupiah(checkout.selectedItem.price + checkout.selectedPayment.fee) : 'Rp 0'}</span>
+                                </div>
+                                <button onclick="handleCheckoutAction()" class="w-full py-3 md:py-4 rounded-2xl font-black text-lg tracking-wide transition shadow-lg flex items-center justify-center gap-3 animate-shimmer-effect relative overflow-hidden ${!checkout.selectedItem || !checkout.selectedPayment || !checkout.userId ? 'bg-slate-700/30 text-slate-500 cursor-not-allowed' : 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white transform hover:-translate-y-1'}">
+                                    <i data-lucide="credit-card"></i> BELI SEKARANG
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            `).join('');
-
-            switchTab('detail');
+            </div>`;
         }
 
-        function handleBack() {
-            switchTab('home');
+        function RenderHome() {
+            const t = getTheme();
+            return `
+            <div class="max-w-7xl mx-auto px-4 md:px-6 py-8 relative z-10 animate-fade-in">
+                
+                <!-- BANNER WRAPPER (Targeted by navigateBanner to avoid full reload) -->
+                <div id="banner-wrapper">
+                    ${RenderBanner()}
+                </div>
+
+                ${RenderFlashSale()}
+                ${RenderGameGrid()}
+                
+                <!-- Features -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 pt-10 border-t ${t.border}">
+                    <div class="text-center p-6 rounded-2xl ${t.card} animate-float"><div class="p-4 bg-red-500/10 rounded-full text-red-500 mb-4 inline-block"><i data-lucide="zap" width="32" height="32"></i></div><h4 class="font-bold text-lg ${t.text}">Proses Kilat</h4><p class="text-sm ${t.textMuted} mt-2">Otomatis 24 jam.</p></div>
+                    <div class="text-center p-6 rounded-2xl ${t.card} animate-float" style="animation-delay: 1s"><div class="p-4 bg-green-500/10 rounded-full text-green-500 mb-4 inline-block"><i data-lucide="shield-check" width="32" height="32"></i></div><h4 class="font-bold text-lg ${t.text}">100% Legal</h4><p class="text-sm ${t.textMuted} mt-2">Aman terpercaya.</p></div>
+                    <div class="text-center p-6 rounded-2xl ${t.card} animate-float" style="animation-delay: 2s"><div class="p-4 bg-yellow-500/10 rounded-full text-yellow-500 mb-4 inline-block"><i data-lucide="crown" width="32" height="32"></i></div><h4 class="font-bold text-lg ${t.text}">Layanan VIP</h4><p class="text-sm ${t.textMuted} mt-2">Prioritas CS.</p></div>
+                </div>
+
+                <!-- Stats -->
+                <div class="mt-16 rounded-3xl p-8 border relative overflow-hidden ${t.card}">
+                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 mix-blend-overlay"></div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
+                        ${stats.map(s => `
+                            <div class="text-center">
+                                <div class="inline-flex p-3 rounded-full bg-red-600/10 text-red-500 mb-3 animate-pulse-slow"><i data-lucide="${s.icon}"></i></div>
+                                <h3 class="text-2xl md:text-3xl font-black ${t.text}">${s.value}</h3>
+                                <p class="text-xs uppercase tracking-widest font-bold ${t.textMuted}">${s.label}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Testimonials -->
+                <div class="mt-20">
+                    <h3 class="text-2xl font-black text-center mb-8 ${t.text}">KATA MEREKA</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        ${testimonials.map(testi => `
+                            <div class="p-6 rounded-2xl border hover:-translate-y-2 transition duration-300 ${t.card}">
+                                <div class="flex gap-1 mb-4 text-yellow-400"><i data-lucide="star" width="14" fill="currentColor"></i><i data-lucide="star" width="14" fill="currentColor"></i><i data-lucide="star" width="14" fill="currentColor"></i><i data-lucide="star" width="14" fill="currentColor"></i><i data-lucide="star" width="14" fill="currentColor"></i></div>
+                                <p class="text-sm italic mb-6 ${t.textMuted}">"${testi.quote}"</p>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-white font-bold">${testi.name.charAt(0)}</div>
+                                    <div><h4 class="font-bold text-sm ${t.text}">${testi.name}</h4><p class="text-[10px] text-red-500 font-bold uppercase">${testi.role}</p></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <div class="mt-20 max-w-3xl mx-auto space-y-4">
+                     <h3 class="text-2xl font-black text-center mb-8 ${t.text}">FAQ</h3>
+                     ${faqs.map(faq => `
+                        <div onclick="setState({activeFaq: ${state.activeFaq === faq.id ? 'null' : faq.id}})" class="rounded-2xl border overflow-hidden cursor-pointer ${t.card} ${state.activeFaq === faq.id ? 'border-red-500' : ''}">
+                            <div class="p-5 flex justify-between items-center"><h4 class="font-bold text-sm ${t.text}">${faq.q}</h4><i data-lucide="chevron-down" class="transition transform ${state.activeFaq === faq.id ? 'rotate-180 text-red-500' : t.textMuted}"></i></div>
+                            <div class="px-5 pb-5 text-sm ${t.textMuted} ${state.activeFaq === faq.id ? 'block' : 'hidden'}">${faq.a}</div>
+                        </div>
+                     `).join('')}
+                </div>
+            </div>`;
         }
 
-        function selectItem(id, price, name) {
-            state.selectedItem = { id, price, name };
-            selectGame(state.selectedGame.id); // Re-render to show active state
-            updateTotal();
+        function RenderHistory() {
+            const t = getTheme();
+            return `
+            <div class="max-w-3xl mx-auto py-16 text-center animate-fade-in px-4">
+                <div class="rounded-3xl p-8 md:p-12 border ${t.card} animate-fade-in-up">
+                    <div class="w-20 h-20 bg-red-500/10 rounded-full mx-auto flex items-center justify-center mb-6 border border-red-500/20 animate-pulse-slow"><i data-lucide="search" class="text-red-500" width="32"></i></div>
+                    <h2 class="text-2xl font-black ${t.text} mb-3">Lacak Pesanan</h2>
+                    <p class="${t.textMuted} mb-6 text-sm">Masukkan nomor invoice transaksi kamu untuk melihat status.</p>
+                    <div class="flex gap-3 max-w-md mx-auto">
+                        <input type="text" placeholder="INV-XXXXXX" class="flex-1 rounded-xl px-5 py-3 outline-none focus:ring-2 focus:ring-red-500 transition ${t.input}">
+                        <button class="bg-red-600 text-white font-bold px-6 rounded-xl hover:bg-red-500">Cek</button>
+                    </div>
+                </div>
+            </div>`;
         }
 
-        function selectPayment(id, fee, name) {
-            state.selectedPayment = { id, fee, name };
-            selectGame(state.selectedGame.id); // Re-render to show active state
-            updateTotal();
+        function RenderAbout() {
+            const t = getTheme();
+            return `
+            <div class="max-w-4xl mx-auto py-12 animate-fade-in px-4 text-center">
+                <h2 class="text-4xl md:text-5xl font-black mb-4 ${t.text}">THE STORY OF <span class="text-red-500">ANOZ</span></h2>
+                <div class="rounded-3xl overflow-hidden border relative group hover:shadow-2xl transition duration-500 ${t.card} mt-12 p-8 md:p-12 flex flex-col md:flex-row items-center gap-10 text-left">
+                    <div class="relative"><div class="w-48 h-48 rounded-full p-1.5 bg-gradient-to-br from-red-500 via-yellow-500 to-purple-600 animate-spin-slow"><div class="w-full h-full rounded-full bg-slate-800 flex items-center justify-center text-6xl font-black text-slate-700">A</div></div><div class="absolute -top-2 -right-2 bg-yellow-400 p-2 rounded-full border-4 border-[#111]"><i data-lucide="crown"></i></div></div>
+                    <div>
+                        <h3 class="text-3xl font-black uppercase mb-1 ${t.text}">Adisa Nawfal <span class="text-red-500">Zia-ul alam</span></h3>
+                        <div class="inline-block px-4 py-1 rounded-full bg-red-600 text-white text-xs font-bold mb-4">FOUNDER & CEO</div>
+                        <p class="leading-relaxed ${t.textMuted} mb-4"><strong class="text-red-500">"ANOZ"</strong> adalah brand dari <strong class="${t.text}">Adisa Nawfal</strong> (NOpal). Dedikasi untuk memberikan akses top-up game termurah dan teraman.</p>
+                        <p class="text-sm italic font-serif text-slate-500">"Gaming bukan sekadar hobi, tapi gaya hidup."</p>
+                    </div>
+                </div>
+            </div>`;
         }
 
-        function updateTotal() {
-            if (state.selectedItem && state.selectedPayment) {
-                const total = state.selectedItem.price + state.selectedPayment.fee;
-                document.getElementById('detail-total-price').innerText = "Rp " + new Intl.NumberFormat('id-ID').format(total);
+        function RenderFooter() {
+            const t = getTheme();
+            return `
+            <footer class="border-t mt-20 pb-32 md:pb-12 ${state.isDarkMode ? 'bg-[#050505] border-white/5' : 'bg-white border-red-100'}">
+                <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-8 text-center md:text-left">
+                    <div class="md:col-span-2">
+                        <h1 class="text-2xl font-black ${t.text} mb-4">ANOZ<span class="text-red-500">STORE</span></h1>
+                        <p class="text-sm ${t.textMuted} max-w-sm mx-auto md:mx-0">Platform top-up game premium. Aman, Cepat, Terpercaya.</p>
+                        <div class="flex justify-center md:justify-start gap-4 mt-4">
+                            <div class="w-10 h-10 rounded-full border flex items-center justify-center ${t.textMuted} hover:bg-red-600 hover:text-white transition"><i data-lucide="instagram" width="18"></i></div>
+                            <div class="w-10 h-10 rounded-full border flex items-center justify-center ${t.textMuted} hover:bg-red-600 hover:text-white transition"><i data-lucide="youtube" width="18"></i></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-4 ${t.text}">Menu</h4>
+                        <ul class="space-y-2 text-sm ${t.textMuted}">
+                            <li onclick="setState({activeTab:'home', selectedGame:null})" class="cursor-pointer hover:text-red-500">Beranda</li>
+                            <li onclick="setState({activeTab:'history'})" class="cursor-pointer hover:text-red-500">Lacak Pesanan</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-4 ${t.text}">Pembayaran</h4>
+                        <div class="flex flex-wrap justify-center md:justify-start gap-2">
+                             ${['QRIS','DANA','OVO','BCA'].map(m => `<span class="text-[10px] px-3 py-1 rounded border font-bold ${state.isDarkMode ? 'bg-white/5 border-white/10 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'}">${m}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center text-xs py-8 border-t ${state.isDarkMode ? 'border-white/5 text-slate-600' : 'border-slate-100 text-slate-400'}">&copy; 2024 AnozStore. All rights reserved.</div>
+            </footer>
+            
+            <!-- Mobile Nav -->
+            <div class="md:hidden fixed bottom-6 left-6 right-6 rounded-2xl border backdrop-blur-xl flex justify-around items-center p-4 z-50 shadow-2xl ${t.nav}">
+                <button onclick="setState({activeTab:'home', selectedGame:null})" class="${state.activeTab === 'home' && !state.selectedGame ? 'text-red-500' : t.textMuted}"><i data-lucide="home"></i></button>
+                <div class="w-14 h-14 bg-red-600 rounded-full -mt-10 border-[6px] flex items-center justify-center shadow-lg transform active:scale-95 transition" style="border-color: ${state.isDarkMode ? '#111' : '#fff'}"><i data-lucide="shopping-cart" class="text-white"></i></div>
+                <button onclick="setState({activeTab:'history'})" class="${state.activeTab === 'history' ? 'text-red-500' : t.textMuted}"><i data-lucide="search"></i></button>
+            </div>
+
+            <!-- Floating Chat -->
+            <a href="https://wa.me/6281234567890" target="_blank" class="fixed bottom-24 right-6 md:bottom-10 md:right-10 z-50 p-4 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition animate-float">
+                <i data-lucide="message-circle" width="28" height="28"></i>
+                <span class="absolute top-0 right-0 -mt-1 -mr-1 flex h-4 w-4"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span><span class="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span></span>
+            </a>
+            
+            <!-- Noise Overlay -->
+            <div class="fixed inset-0 pointer-events-none z-[1] opacity-[0.03] mix-blend-overlay" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E')"></div>
+            `;
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            let content = RenderNavbar();
+
+            if (state.selectedGame) {
+                content += RenderGameDetail();
+            } else if (state.activeTab === 'home') {
+                content += RenderHome();
+            } else if (state.activeTab === 'history') {
+                content += RenderHistory();
+            } else if (state.activeTab === 'about') {
+                content += RenderAbout();
+            }
+            
+            content += RenderFooter();
+            app.innerHTML = content;
+            lucide.createIcons();
+            
+            // Restore focus if searching
+            if(state.searchQuery && !state.selectedGame && state.activeTab === 'home') {
+               const input = document.querySelector('input[placeholder="Cari game..."]');
+               if(input) {
+                   input.focus();
+                   input.setSelectionRange(input.value.length, input.value.length);
+               }
             }
         }
 
-        function handleCheckout() {
-            state.userId = document.getElementById('input-userid').value;
-            state.serverId = document.getElementById('input-serverid')?.value || '';
+        // --- GLOBAL EFFECTS & INIT ---
+        
+        // Timer
+        setInterval(() => {
+            if(state.timeLeft <= 0) state.timeLeft = 7200 + Math.random() * 10000;
+            else state.timeLeft -= 1;
+            // Only re-render if visible
+            const timerEl = document.querySelector('.animate-pulse-slow span');
+            if(timerEl) timerEl.innerText = formatTime(state.timeLeft);
+        }, 1000);
 
-            if (!state.userId || !state.selectedItem || !state.selectedPayment) {
-                showNotification("Mohon lengkapi data pesanan!", "error");
-                return;
+        // Banner Auto Slide (UPDATED: Uses navigateBanner to prevent full page reload)
+        setInterval(() => {
+            if(state.activeTab === 'home' && !state.selectedGame) {
+                // Calculate next index
+                const nextIndex = (state.currentBanner + 1) % banners.length;
+                navigateBanner(nextIndex);
             }
-            const total = state.selectedItem.price + state.selectedPayment.fee;
-            const msg = `Halo Admin! Order ${state.selectedGame.name}, ID: ${state.userId}, Item: ${state.selectedItem.name}, Pay: ${state.selectedPayment.name}, Total: Rp ${new Intl.NumberFormat('id-ID').format(total)}`;
-            window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(msg)}`, '_blank');
-            showNotification("Mengarahkan ke WhatsApp...", "success");
-        }
+        }, 5000);
 
-        // --- UTILS ---
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            document.body.classList.toggle('light-mode');
-        }
+        // Custom Cursor Logic
+        const cursorMain = document.getElementById('cursor-main');
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorInner = document.getElementById('cursor-dot-inner');
 
-        function toggleMenu() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        }
+        window.addEventListener('mousemove', (e) => {
+            cursorMain.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+            cursorDot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`;
+        });
 
-        function showNotification(msg, type) {
-            const notif = document.getElementById('notification');
-            document.getElementById('notif-msg').innerText = msg;
-            notif.classList.remove('opacity-0', 'translate-y-[-20px]');
-            notif.classList.add(type === 'error' ? 'bg-red-600' : 'bg-emerald-500', 'text-white');
-            setTimeout(() => {
-                notif.classList.add('opacity-0', 'translate-y-[-20px]');
-                notif.classList.remove('bg-red-600', 'bg-emerald-500');
-            }, 3000);
-        }
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.tagName === 'INPUT' || e.target.closest('.cursor-pointer')) {
+                cursorMain.style.transform += ' rotate(45deg) scale(1.5)';
+                cursorInner.classList.add('scale-150', 'border-red-500', 'opacity-80', 'animate-spin-slow');
+                cursorInner.classList.remove('scale-50', 'opacity-40');
+            } else {
+                cursorMain.style.transform = cursorMain.style.transform.replace(' rotate(45deg) scale(1.5)', '');
+                cursorInner.classList.remove('scale-150', 'border-red-500', 'opacity-80', 'animate-spin-slow');
+                cursorInner.classList.add('scale-50', 'opacity-40');
+            }
+        });
 
-        function prevBanner() {
-            state.currentBanner = state.currentBanner === 0 ? banners.length - 1 : state.currentBanner - 1;
-            renderBanners();
-        }
-        function nextBanner() {
-            state.currentBanner = (state.currentBanner + 1) % banners.length;
-            renderBanners();
-        }
+        // Initialize
+        render();
 
-        function startFlashSaleTimer() {
-            let timeLeft = 10800;
-            setInterval(() => {
-                timeLeft--;
-                if(timeLeft <= 0) timeLeft = 10800;
-                const h = Math.floor(timeLeft / 3600).toString().padStart(2, '0');
-                const m = Math.floor((timeLeft % 3600) / 60).toString().padStart(2, '0');
-                const s = (timeLeft % 60).toString().padStart(2, '0');
-                document.getElementById('flash-sale-timer').innerText = `${h} : ${m} : ${s}`;
-            }, 1000);
-        }
-
-        function startLiveNotif() {
-            const fakePurchases = [
-                { name: 'Rian', item: '86 Diamonds', game: 'Mobile Legends' },
-                { name: 'Sarah', item: '60 UC', game: 'PUBG' },
-                { name: 'Budi', item: '140 DM', game: 'Free Fire' }
-            ];
-            setInterval(() => {
-                const data = fakePurchases[Math.floor(Math.random() * fakePurchases.length)];
-                const popup = document.getElementById('live-notif');
-                document.getElementById('live-notif-avatar').innerText = data.name.charAt(0);
-                document.getElementById('live-notif-item').innerText = data.item;
-                document.getElementById('live-notif-game').innerText = data.game;
-                popup.classList.remove('hidden');
-                setTimeout(() => popup.classList.add('hidden'), 3000);
-            }, 8000);
-        }
-
-        // Run
-        init();
     </script>
 </body>
 </html>
-
-
