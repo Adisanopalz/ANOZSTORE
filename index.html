@@ -142,6 +142,13 @@
             { id: 26, category: 'voucher', name: 'Growtopia', publisher: 'Ubisoft', imgUrl: 'https://i.pinimg.com/736x/64/b2/c8/64b2c870265166d359e373a8608e82c7.jpg', image: 'bg-gradient-to-br from-green-400 to-yellow-400', icon: 'GT', items: [{ id: 'gt1', name: 'World Lock', price: 5000 }] },
         ];
 
+        // NEW: Data Berita
+        const news = [
+            { id: 1, title: "Cara Dapetin Skin Legend Gratis!", category: "Tips & Trick", date: "2 Jam lalu", img: "https://i.pinimg.com/736x/21/53/7d/21537d82462677943440794df7449492.jpg" },
+            { id: 2, title: "Update Patch Note Terbaru MLBB", category: "News", date: "1 Hari lalu", img: "https://i.pinimg.com/736x/cf/e6/83/cfe68383f237307077699942704287e0.jpg" },
+            { id: 3, title: "Promo Top Up Akhir Tahun", category: "Event", date: "3 Hari lalu", img: "https://i.pinimg.com/736x/87/49/c4/8749c4f809930f703444490794406206.jpg" }
+        ];
+
         const payments = [
             { id: 'qris', name: 'QRIS (All Payment)', fee: 0, icon: 'qr-code' },
             { id: 'dana', name: 'DANA', fee: 0, icon: 'wallet' },
@@ -342,26 +349,92 @@
 
         function RenderFlashSale() {
             const t = getTheme();
+            // Data Flash Sale diupdate dengan gameId dan imgUrl agar bisa interaktif
             const items = [
-                {name: '172 Diamonds', game: 'Mobile Legends', price: 40000, promo: 35000, img: 'bg-indigo-900'},
-                {name: '60 UC', game: 'PUBG Mobile', price: 14000, promo: 12500, img: 'bg-yellow-800'},
-                {name: 'Weekly Pass', game: 'Mobile Legends', price: 28000, promo: 24500, img: 'bg-blue-900'},
-                {name: 'Welkin Moon', game: 'Genshin Impact', price: 79000, promo: 69000, img: 'bg-purple-900'},
+                {name: 'Weekly Pass', game: 'Mobile Legends', price: 28000, promo: 24500, gameId: 1, imgUrl: 'https://i.pinimg.com/1200x/d6/23/8e/d6238e6d724fddec242eaf389b67815a.jpg'},
+                {name: '60 UC', game: 'PUBG Mobile', price: 14000, promo: 12500, gameId: 3, imgUrl: 'https://i.pinimg.com/1200x/5e/68/e4/5e68e4a0cbe4a056aca1c33c5c6dcbbc.jpg'},
+                {name: 'Welkin Moon', game: 'Genshin Impact', price: 79000, promo: 69000, gameId: 4, imgUrl: 'https://i.pinimg.com/1200x/09/a4/ca/09a4ca2d90657e578ca8734b35102b5e.jpg'},
+                {name: '70 Diamonds', game: 'Free Fire', price: 10000, promo: 9000, gameId: 2, imgUrl: 'https://i.pinimg.com/736x/f2/3c/95/f23c95ed4421952cac128d0560ea1b73.jpg'},
             ];
+            
             return `
-            <div class="mb-12">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-2"><i data-lucide="zap" class="text-yellow-400 fill-yellow-400 animate-pulse"></i><h3 class="text-xl font-black italic tracking-tighter ${t.text}">FLASH SALE</h3></div>
-                    <div class="flex items-center gap-2 bg-red-600 px-3 py-1 rounded-lg text-white font-mono font-bold text-sm animate-pulse-slow"><i data-lucide="clock" width="16"></i><span>${formatTime(state.timeLeft)}</span></div>
+            <div class="mb-12 animate-fade-in-up">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                        <div class="p-2 bg-yellow-500/10 rounded-lg"><i data-lucide="zap" class="text-yellow-400 fill-yellow-400 animate-pulse"></i></div>
+                        <div>
+                            <h3 class="text-xl font-black italic tracking-tighter ${t.text}">FLASH SALE</h3>
+                            <p class="text-[10px] ${t.textMuted}">Berakhir dalam:</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-600 px-4 py-2 rounded-xl text-white font-mono font-bold text-sm shadow-lg shadow-red-600/30 animate-pulse-slow">
+                        <i data-lucide="clock" width="16"></i><span>${formatTime(state.timeLeft)}</span>
+                    </div>
                 </div>
+                
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     ${items.map((item, i) => `
-                        <div class="p-4 rounded-2xl border relative overflow-hidden group cursor-pointer ${t.card} hover:border-red-500/50 hover:shadow-lg transition transform hover:-translate-y-1" style="animation: fadeInUp 0.6s ease-out forwards ${i * 0.1}s; opacity: 0;">
-                            <div class="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg z-10 animate-pulse">HEMAT ${Math.round(((item.price - item.promo)/item.price)*100)}%</div>
-                            <div class="h-24 rounded-xl ${item.img} mb-3 flex items-center justify-center"><i data-lucide="zap" class="text-white/50"></i></div>
-                            <h4 class="font-bold text-sm ${t.text}">${item.name}</h4>
-                            <p class="text-[10px] text-slate-500">${item.game}</p>
-                            <div class="mt-2"><p class="text-[10px] text-slate-400 line-through">Rp ${item.price.toLocaleString()}</p><p class="text-red-500 font-bold text-sm">Rp ${item.promo.toLocaleString()}</p></div>
+                        <div onclick="setState({selectedGame: ${item.gameId}, checkout: {userId:'', serverId:'', selectedItem:null, selectedPayment:null}})" class="group relative rounded-2xl overflow-hidden cursor-pointer border ${t.card} hover:border-red-500 hover:shadow-xl hover:shadow-red-500/20 transition-all duration-300 transform hover:-translate-y-1">
+                            <!-- Discount Badge -->
+                            <div class="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl z-20 shadow-md">
+                                -${Math.round(((item.price - item.promo)/item.price)*100)}%
+                            </div>
+                            
+                            <!-- Image Area -->
+                            <div class="h-28 w-full relative overflow-hidden">
+                                <img src="${item.imgUrl}" class="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                                <div class="absolute bottom-2 left-3 z-10">
+                                     <h4 class="font-bold text-white text-sm shadow-black drop-shadow-md leading-tight">${item.name}</h4>
+                                     <p class="text-[10px] text-gray-300 opacity-90">${item.game}</p>
+                                </div>
+                            </div>
+
+                            <!-- Price Info -->
+                            <div class="p-3 bg-opacity-50 backdrop-blur-sm">
+                                <div class="flex items-center justify-between mb-1">
+                                    <p class="text-[10px] text-slate-500 line-through">Rp ${item.price.toLocaleString()}</p>
+                                    <i data-lucide="flame" class="text-orange-500 w-3 h-3 fill-orange-500 animate-bounce"></i>
+                                </div>
+                                <p class="text-red-500 font-black text-lg">Rp ${item.promo.toLocaleString()}</p>
+                                <div class="w-full bg-slate-700/30 h-1.5 rounded-full mt-2 overflow-hidden">
+                                    <div class="bg-red-500 h-full rounded-full" style="width: ${80 + Math.random() * 15}%"></div>
+                                </div>
+                                <p class="text-[9px] text-right text-slate-500 mt-1">Tersisa sedikit!</p>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+        }
+
+        // NEW: Function to Render News Section
+        function RenderNews() {
+            const t = getTheme();
+            return `
+            <div class="mb-16 pt-8 border-t ${t.border} animate-fade-in-up">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-black ${t.text} flex items-center gap-2">
+                        <i data-lucide="newspaper" class="text-red-500"></i> BERITA & EVENT
+                    </h3>
+                    <a href="#" class="text-sm font-bold text-red-500 hover:underline">Lihat Semua</a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    ${news.map((item, i) => `
+                        <div class="group cursor-pointer rounded-2xl overflow-hidden border ${t.card} hover:-translate-y-2 transition duration-300">
+                            <div class="h-40 w-full relative overflow-hidden">
+                                <img src="${item.img}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110 group-hover:rotate-1">
+                                <div class="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold text-white border border-white/20 uppercase tracking-wider">
+                                    ${item.category}
+                                </div>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex items-center gap-2 mb-2 text-[10px] ${t.textMuted}">
+                                    <i data-lucide="clock" width="12"></i> ${item.date}
+                                </div>
+                                <h4 class="font-bold text-lg leading-tight ${t.text} group-hover:text-red-500 transition line-clamp-2">${item.title}</h4>
+                                <p class="text-sm ${t.textMuted} mt-2 line-clamp-2">Dapatkan informasi terbaru seputar update patch, event skin gratis, dan promo menarik lainnya hanya di sini.</p>
+                            </div>
                         </div>
                     `).join('')}
                 </div>
@@ -518,6 +591,7 @@
 
                 ${RenderFlashSale()}
                 ${RenderGameGrid()}
+                ${RenderNews()} <!-- NEW SECTION ADDED HERE -->
                 
                 <!-- Features -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 pt-10 border-t ${t.border}">
